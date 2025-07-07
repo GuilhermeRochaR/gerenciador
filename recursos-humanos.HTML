@@ -83,6 +83,12 @@
     </div>
     <div class="save-btn-wrapper">
       <button class="save-btn" id="btnSalvar" disabled>SALVAR</button>
+
+      <div class="view-btn-wrapper" style="margin-top: 20px;">
+        <button class="view-btn" id="btnVisualizar">VISUALIZAR ARQUIVOS</button>
+      </div>
+
+
       <p id="mensagemSucesso" style="color: green; display: none; margin-top: 10px;">
         ✔️ Arquivos salvos com sucesso!
       </p>
@@ -91,6 +97,10 @@
   </div>
 
   <script>
+
+    let arquivosRegistrados = [];
+
+
     const uploadArea = document.getElementById("uploadArea");
     const fileList = document.getElementById("fileList");
     let arquivos = [];
@@ -226,16 +236,33 @@ inputPesquisa.addEventListener("input", verificarCampos);
 btnSalvar.addEventListener("click", (e) => {
   e.preventDefault();
 
-  // Simula "salvar" arquivos
+  const dataEnvio = new Date();
+  arquivos.forEach((arquivo, index) => {
+    const tipoExclusao = document.querySelector(`input[name="exclusao_${index}"]:checked`).value;
+    let anos = null;
+    let dataExpiracao = null;
+
+    if (tipoExclusao === "automatica") {
+      anos = parseInt(document.getElementById(`anos_${index}`).value);
+      dataExpiracao = new Date(dataEnvio);
+      dataExpiracao.setFullYear(dataEnvio.getFullYear() + anos);
+    }
+
+    arquivosRegistrados.push({
+      nome: arquivo.name,
+      tipoExclusao,
+      dataEnvio,
+      dataExpiracao,
+      conteudo: arquivo // simulação
+    });
+  });
+
   mensagemSucesso.style.display = "block";
-
-  // Se quiser, limpa os campos e arquivos depois:
-  // arquivos = [];
-  // atualizarListaArquivos();
-  // inputPesquisa.value = "";
-  // verificarCampos();
+  arquivos = [];
+  atualizarListaArquivos();
+  inputPesquisa.value = "";
+  verificarCampos();
 });
-
 
 
 // Código da área drag and drop pra caso ela seja clicada
@@ -268,6 +295,78 @@ fileInput.addEventListener("change", (event) => {
   }
 });
 
+
+
+document.getElementById("btnVisualizar").addEventListener("click", () => {
+  const area = document.getElementById("areaVisualizacao");
+  const lista = document.getElementById("listaArquivosRegistrados");
+
+  if (arquivosRegistrados.length === 0) {
+    lista.innerHTML = "<p>Nenhum arquivo registrado ainda.</p>";
+  } else {
+lista.innerHTML = arquivosRegistrados.map((arquivo, index) => {
+  const envio = arquivo.dataEnvio.toLocaleDateString("pt-BR");
+  const expiracao = arquivo.dataExpiracao
+    ? arquivo.dataExpiracao.toLocaleDateString("pt-BR")
+    : "—";
+
+  return `
+    <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+      <strong>📄 ${arquivo.nome}</strong><br>
+      Tipo de exclusão: <em>${arquivo.tipoExclusao}</em><br>
+      Enviado em: ${envio}<br>
+      Expira em: ${expiracao}<br>
+
+      <button disabled style="margin-top: 5px;">⬇️ Baixar</button>
+      <button onclick="excluirArquivoRegistrado(${index})" style="background-color:#ff6666; color:white; border:none; padding:5px 10px; margin-left:10px; border-radius:4px;">🗑️ Excluir</button>
+      <button onclick="editarDataExpiracao(${index})" style="background-color:#007bff; color:white; border:none; padding:5px 10px; margin-left:10px; border-radius:4px;">✏️ Editar Data</button>
+
+      <div id="editarArea_${index}" style="margin-top: 5px; display: none;">
+        <input type="number" id="novosAnos_${index}" value="2" min="1" max="10" style="width: 60px;">
+        <button onclick="salvarNovaData(${index})" style="background-color:green; color:white; border:none; padding:5px 10px; margin-left:5px; border-radius:4px;">Salvar</button>
+      </div>
+    </div>
+  `;
+}).join("");
+
+
+
+  }
+
+  area.style.display = "block";
+});
+
+function excluirArquivoRegistrado(index) {
+  if (confirm("Tem certeza que deseja excluir este arquivo?")) {
+    arquivosRegistrados.splice(index, 1);
+    document.getElementById("btnVisualizar").click(); // Reatualiza a visualização
+  }
+}
+
+
+function editarDataExpiracao(index) {
+  const area = document.getElementById(`editarArea_${index}`);
+  area.style.display = area.style.display === "none" ? "block" : "none";
+}
+
+function salvarNovaData(index) {
+  const anos = parseInt(document.getElementById(`novosAnos_${index}`).value);
+  const novaData = new Date(arquivosRegistrados[index].dataEnvio);
+  novaData.setFullYear(novaData.getFullYear() + anos);
+  arquivosRegistrados[index].dataExpiracao = novaData;
+
+  alert(`Nova data de expiração salva para ${anos} ano(s).`);
+  document.getElementById("btnVisualizar").click(); // Reatualiza a lista
+}
+
+
+
   </script>
+
+  <div id="areaVisualizacao" style="display:none; margin: 30px auto; width: 90%; max-width: 700px;">
+  <h3>📁 Arquivos Registrados</h3>
+  <div id="listaArquivosRegistrados"></div>
+</div>
+
 </body>
 </html>

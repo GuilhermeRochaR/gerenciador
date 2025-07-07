@@ -97,3 +97,14 @@ input[type="text"] {
   overflow-y: auto;          /* ativa rolagem vertical se necessário */
   padding-right: 1px;       /* espaço pra barra de rolagem */
 }
+
+
+.view-btn {
+  background-color: #1e5b0d;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
