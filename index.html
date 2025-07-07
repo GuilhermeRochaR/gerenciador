@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="frontend/css/index.css">
+</head>
+<body>
+  <header class="header">
+    <div class="titulo">LOGIN</div>
+    <img src="logopresistema.png" alt="Logo" class="logo">
+  </header>
+
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-top-bar">
+        <span class="home-icon">🏠</span>
+      </div>
+      <div class="form">
+        <label for="usuario">USUÁRIO</label>
+        <input type="text" id="usuario" placeholder="USUÁRIO">
+
+        <label for="senha">SENHA</label>
+        <input type="password" id="senha" placeholder="SENHA">
+
+        <button class="btn-entrar">ENTRAR</button>
+
+        <!-- Mostrando localização -->
+        <p id="info-localizacao" style="font-size: 14px; color: gray; margin-top: 10px;">
+          Detectando localização...
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE LOCALIZAÇÃO -->
+  <script>
+    async function usarIPComoBackup() {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        document.getElementById('info-localizacao').innerText =
+          `Localização por IP: ${data.city} - ${data.region}`;
+        console.log("IP:", data.ip);
+        console.log("Cidade:", data.city);
+        console.log("Estado:", data.region);
+      } catch (error) {
+        alert("Erro ao obter IP. Acesso bloqueado.");
+        window.location.href = "acesso-negado.html";
+      }
+    }
+
+    function bloquearSeNegar() {
+      alert("⚠️ Você precisa permitir o uso da localização para acessar o sistema.");
+      window.location.href = "acesso-negado.html";
+    }
+
+    function localizarUsuario() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (posicao) => {
+            const lat = posicao.coords.latitude;
+            const lon = posicao.coords.longitude;
+            document.getElementById("info-localizacao").innerText =
+              `Localização por GPS: Lat ${lat.toFixed(3)}, Lon ${lon.toFixed(3)}`;
+            console.log("Lat:", lat, "Lon:", lon);
+          },
+          (erro) => {
+            bloquearSeNegar();
+          },
+          { timeout: 10000 }
+        );
+      } else {
+        usarIPComoBackup();
+      }
+    }
+
+    window.onload = localizarUsuario;
+  </script>
+</body>
+</html>

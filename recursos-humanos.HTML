@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos Humanos</title>
+  <link rel="stylesheet" href="/frontend/css/recursos-humanos.css">
+  <style>
+    /* CSS adicional para drag and drop */
+    .upload-area {
+      border: 2px dashed #aaa;
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      margin: 40px auto;
+      width: 90%;
+      max-width: 500px;
+      background-color: #f5f5f5;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-area.dragover {
+      background-color: #e0ffe0;
+      border-color: #1e5b0d;
+    }
+
+    .file-list {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .file-item button {
+      background-color: #ff6666;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .loading {
+      font-style: italic;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div><strong><a href="#" class="link">RECURSOS HUMANOS</a></strong></div>
+    <div class="user">
+      <span>NOME COMPLETO DO USUÁRIO</span>
+      <div class="icon">👤</div>
+    </div>
+  </div>
+
+  <div class="upload-area" id="uploadArea">
+    Arraste o(s) Arquivo(s) aqui ou Clique Aqui
+    <div id="fileList" class="file-list"></div>
+
+    
+    <input type="file" id="fileInput" multiple style="display: none;">
+    <div id="fileList" class="file-list"></div>
+
+  </div>
+
+  <div class="form-container">
+    <div class="form-group">
+      <label for="pesquisa">NOME DE PESQUISA</label>
+      <input type="text" id="pesquisa" placeholder="DIGITE AQUI">
+    </div>
+    <div class="form-group">
+      <label for="observacao">OBSERVAÇÃO</label>
+      <input type="text" id="observacao" placeholder="DIGITE AQUI">
+    </div>
+    <div class="save-btn-wrapper">
+      <button class="save-btn" id="btnSalvar" disabled>SALVAR</button>
+      <p id="mensagemSucesso" style="color: green; display: none; margin-top: 10px;">
+        ✔️ Arquivos salvos com sucesso!
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById("uploadArea");
+    const fileList = document.getElementById("fileList");
+    let arquivos = [];
+
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.classList.add("dragover");
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+      uploadArea.classList.remove("dragover");
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("dragover");
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length > 0) {
+        mostrarAnimacaoDeCarregamento();
+
+        setTimeout(() => {
+          arquivos.push(...files);
+          atualizarListaArquivos();
+        }, 1000); // Simulando carregamento de 1s
+      }
+    });
+
+    function mostrarAnimacaoDeCarregamento() {
+      fileList.innerHTML = `<p class="loading">Carregando arquivo...</p>`;
+    }
+
+    function atualizarListaArquivos() {
+      fileList.innerHTML = "";
+
+      arquivos.forEach((arquivo, index) => {
+        const item = document.createElement("div");
+        item.className = "file-item";
+        item.innerHTML = `
+          ${arquivo.name}
+          <button onclick="removerArquivo(${index})">Excluir</button>
+        `;
+        fileList.appendChild(item);
+      });
+    }
+
+    function removerArquivo(index) {
+      arquivos.splice(index, 1);
+      atualizarListaArquivos();
+    }
+
+    const inputPesquisa = document.getElementById("pesquisa");
+const btnSalvar = document.getElementById("btnSalvar");
+const mensagemSucesso = document.getElementById("mensagemSucesso");
+
+// Verifica se pode ativar o botão
+function verificarCampos() {
+  const pesquisaPreenchida = inputPesquisa.value.trim() !== "";
+  const temArquivos = arquivos.length > 0;
+
+  btnSalvar.disabled = !(pesquisaPreenchida && temArquivos);
+}
+
+// Atualiza a lista e verifica os campos
+function atualizarListaArquivos() {
+  fileList.innerHTML = "";
+
+  arquivos.forEach((arquivo, index) => {
+    const item = document.createElement("div");
+    item.className = "file-item";
+    item.innerHTML = `
+      ${arquivo.name}
+      <button onclick="removerArquivo(${index})">Excluir</button>
+    `;
+    fileList.appendChild(item);
+  });
+
+  verificarCampos();
+}
+
+function removerArquivo(index) {
+  arquivos.splice(index, 1);
+  atualizarListaArquivos();
+}
+
+// Verifica em tempo real ao digitar no campo
+inputPesquisa.addEventListener("input", verificarCampos);
+
+// Clique no botão SALVAR
+btnSalvar.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  // Simula "salvar" arquivos
+  mensagemSucesso.style.display = "block";
+
+  // Se quiser, limpa os campos e arquivos depois:
+  // arquivos = [];
+  // atualizarListaArquivos();
+  // inputPesquisa.value = "";
+  // verificarCampos();
+});
+
+
+
+// Código da área drag and drop pra caso ela seja clicada
+
+const fileInput = document.getElementById("fileInput");
+
+// Permitir clicar na área para abrir o explorador de arquivos
+uploadArea.addEventListener("click", () => {
+  fileInput.click();
+});
+
+// Quando arquivos forem escolhidos pelo input
+fileInput.addEventListener("change", (event) => {
+  const files = Array.from(event.target.files);
+
+  if (files.length > 0) {
+    mostrarAnimacaoDeCarregamento();
+
+    setTimeout(() => {
+      arquivos.push(...files);
+      atualizarListaArquivos();
+      fileInput.value = ""; // limpa o input pra permitir novo envio
+    }, 1000);
+  }
+});
+
+  </script>
+</body>
+</html>
