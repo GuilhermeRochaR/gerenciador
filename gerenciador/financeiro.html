@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financeiro</title>
-  <link rel="stylesheet" href="/gerenciador/frontend/css/financeiro.css">
+  <link rel="stylesheet" href="/gerenciador_atualizado/frontend/css/financeiro.css">
 </head>
 <body>
   <div class="header">
@@ -32,13 +32,99 @@
         <input type="text" id="nome" placeholder="DIGITE AQUI">
       </div>
       <div class="form-group">
-        <label for="obs">OBSERVAÇÃO:</label>
+        <label for="obs">OBSERVAÇÃO (OPCIONAL):</label>
         <input type="text" id="obs" placeholder="DIGITE AQUI">
       </div>
       <div class="save-btn-wrapper">
-        <button class="save-btn">SALVAR</button>
+        <button class="save-btn" id="btnSalvar">SALVAR</button>
       </div>
     </div>
   </div>
+
+  <script>
+    // Funcionalidade para salvar dados do financeiro como arquivo de texto no gerenciador
+    document.getElementById('btnSalvar').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Coletar dados do formulário
+      const link = document.getElementById('link').value.trim();
+      const numero = document.getElementById('numero').value.trim();
+      const nome = document.getElementById('nome').value.trim();
+      const observacao = document.getElementById('obs').value.trim();
+      
+      // Validar campos obrigatórios
+      if (!link || !numero || !nome) {
+        alert('Por favor, preencha os campos obrigatórios: Link, Número e Nome.');
+        return;
+      }
+      
+      // Criar conteúdo do arquivo de texto
+      const dataAtual = new Date().toLocaleString('pt-BR');
+      const conteudoArquivo = `DADOS FINANCEIROS
+===================
+
+Data de Criação: ${dataAtual}
+
+LINK: ${link}
+NÚMERO: ${numero}
+NOME: ${nome}
+OBSERVAÇÃO: ${observacao || 'Não informado'}
+
+---
+Arquivo gerado automaticamente pelo sistema Financeiro.`;
+      
+      // Criar nome do arquivo baseado na data e hora
+      const agora = new Date();
+      const nomeArquivo = `financeiro_${agora.getFullYear()}_${String(agora.getMonth() + 1).padStart(2, '0')}_${String(agora.getDate()).padStart(2, '0')}_${String(agora.getHours()).padStart(2, '0')}${String(agora.getMinutes()).padStart(2, '0')}.txt`;
+      
+      // Criar objeto do arquivo para salvar no gerenciador
+      const arquivoParaGerenciador = {
+        id: Date.now(), // ID único
+        nome: nomeArquivo,
+        tipoExclusao: 'manual', // Padrão para arquivos do financeiro
+        dataEnvio: agora,
+        dataExpiracao: null, // Sem expiração automática
+        tamanho: formatarTamanho(conteudoArquivo.length),
+        tipo: 'TXT',
+        origem: 'Financeiro',
+        conteudo: conteudoArquivo, // Conteúdo do arquivo para download
+        // Dados específicos do financeiro
+        dadosFinanceiro: {
+          link,
+          numero,
+          nome,
+          observacao: observacao || 'Não informado'
+        }
+      };
+      
+      // Salvar no localStorage para o gerenciador
+      salvarArquivoNoGerenciador(arquivoParaGerenciador);
+      
+      // Mostrar mensagem de sucesso
+      alert('✅ Dados salvos com sucesso no gerenciador como arquivo de texto!');
+      
+      // Limpar formulário
+      document.getElementById('link').value = '';
+      document.getElementById('numero').value = '';
+      document.getElementById('nome').value = '';
+      document.getElementById('obs').value = '';
+    });
+    
+    // Função para salvar arquivo no gerenciador
+    function salvarArquivoNoGerenciador(arquivo) {
+      let arquivosGerenciador = JSON.parse(localStorage.getItem('arquivos_registrados') || '[]');
+      arquivosGerenciador.push(arquivo);
+      localStorage.setItem('arquivos_registrados', JSON.stringify(arquivosGerenciador));
+    }
+    
+    // Função para formatar tamanho do arquivo
+    function formatarTamanho(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+  </script>
 </body>
 </html>

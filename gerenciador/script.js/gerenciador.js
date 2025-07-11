@@ -44,7 +44,8 @@ function exibirArquivos(arquivos) {
                           arquivo.tipoExclusao === 'manual' ? 'MANUAL' : 'AUTOMÁTICA';
 
         // Identificar origem com ícone
-        const origemIcon = arquivo.origem === 'Cartões' ? '💳' : '👥';
+        const origemIcon = arquivo.origem === 'Cartões' ? '💳' : 
+                          arquivo.origem === 'Financeiro' ? '💰' : '👥';
         const origemText = arquivo.origem || 'RH';
         
         return `
@@ -101,7 +102,8 @@ function mostrarDetalhesArquivo(id) {
                         <strong>Nome do arquivo:</strong> ${arquivo.nome}
                     </div>
                     <div class="detalhe-item">
-                        <strong>Origem:</strong> ${arquivo.origem === 'Cartões' ? '💳 Cartões' : '👥 RH'}
+                        <strong>Origem:</strong> ${arquivo.origem === 'Cartões' ? '💳 Cartões' : 
+                                                  arquivo.origem === 'Financeiro' ? '💰 Financeiro' : '👥 RH'}
                     </div>
                     <div class="detalhe-item">
                         <strong>Tipo:</strong> ${arquivo.tipo}
@@ -167,6 +169,27 @@ function mostrarDetalhesArquivo(id) {
                 </div>
                 <div class="detalhe-item">
                     <strong>Descrição:</strong> ${arquivo.dadosCartao.descricao}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Adicionar detalhes específicos do Financeiro
+    if (arquivo.origem === 'Financeiro' && arquivo.dadosFinanceiro) {
+        detalhesHTML += `
+            <div class="detalhe-secao">
+                <h4>💰 Dados Financeiros</h4>
+                <div class="detalhe-item">
+                    <strong>Link:</strong> ${arquivo.dadosFinanceiro.link}
+                </div>
+                <div class="detalhe-item">
+                    <strong>Número:</strong> ${arquivo.dadosFinanceiro.numero}
+                </div>
+                <div class="detalhe-item">
+                    <strong>Nome:</strong> ${arquivo.dadosFinanceiro.nome}
+                </div>
+                <div class="detalhe-item">
+                    <strong>Observação:</strong> ${arquivo.dadosFinanceiro.observacao}
                 </div>
             </div>
         `;
@@ -344,9 +367,77 @@ function fecharModal() {
     arquivoEditando = null;
 }
 
-// Baixa um arquivo (simulado)
+// Baixa um arquivo
 function baixarArquivo(id) {
-    alert('Funcionalidade de download será implementada em breve.');
+    const arquivos = JSON.parse(localStorage.getItem("arquivos_registrados") || "[]");
+    const arquivo = arquivos.find(a => a.id === id);
+
+    if (!arquivo) {
+        alert("Arquivo não encontrado.");
+        return;
+    }
+
+    let conteudoParaDownload = "";
+    let tipoMime = "text/plain";
+    let nomeArquivo = arquivo.nome;
+
+    // Se o arquivo tem conteúdo (arquivos do Financeiro)
+    if (arquivo.origem === 'Financeiro' && arquivo.conteudo) {
+        conteudoParaDownload = arquivo.conteudo;
+    } 
+    // Para arquivos de RH, simular um download de arquivo genérico
+    else if (arquivo.origem === 'RH') {
+        conteudoParaDownload = `Este é um placeholder para o arquivo original ${arquivo.nome}.\n\nEm um sistema real, o arquivo original seria baixado aqui.`;
+        tipoMime = 'application/octet-stream'; // Tipo MIME genérico para download
+        nomeArquivo = arquivo.nome; // Manter o nome original do arquivo
+    }
+    // Para arquivos de Cartões, simular um download de arquivo genérico
+    else if (arquivo.origem === 'Cartões') {
+        conteudoParaDownload = `Este é um placeholder para o arquivo original ${arquivo.nome}.\n\nEm um sistema real, o arquivo original seria baixado aqui.`;
+        tipoMime = 'application/octet-stream'; // Tipo MIME genérico para download
+        nomeArquivo = arquivo.nome; // Manter o nome original do arquivo
+    }
+    // Fallback para outros tipos de arquivo
+    else {
+        const dataEnvio = new Date(arquivo.dataEnvio).toLocaleString('pt-BR');
+        const dataExpiracao = arquivo.dataExpiracao 
+            ? new Date(arquivo.dataExpiracao).toLocaleString('pt-BR')
+            : 'Sem expiração';
+        
+        conteudoParaDownload = `INFORMAÇÕES DO ARQUIVO
+======================
+
+Nome do arquivo: ${arquivo.nome}
+Origem: ${arquivo.origem || 'Não especificada'}
+Tipo: ${arquivo.tipo}
+Tamanho: ${arquivo.tamanho}
+Data de envio: ${dataEnvio}
+Tipo de exclusão: ${arquivo.tipoExclusao === 'manual' ? 'Manual' : 'Automática'}
+Data de expiração: ${dataExpiracao}
+
+---
+Arquivo de informações gerado pelo sistema de gerenciamento.`;
+        
+        nomeArquivo = `info_${arquivo.nome.replace(/\.[^/.]+$/, "")}.txt`;
+    }
+
+    // Criar o blob e fazer o download
+    const blob = new Blob([conteudoParaDownload], { type: tipoMime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    // Mostrar mensagem de sucesso
+    if (arquivo.origem === 'Financeiro' && arquivo.conteudo) {
+        alert("✅ Arquivo baixado com sucesso!");
+    } else {
+        alert("✅ Arquivo baixado com sucesso!");
+    }
 }
 
 // Exclui um arquivo
