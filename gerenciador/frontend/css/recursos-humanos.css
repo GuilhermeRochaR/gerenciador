@@ -1,0 +1,213 @@
+/*CSS DE RECURSOS_HUMANOS */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #dcdcdc;
+}
+
+.header {
+  background-color: #f4791f;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+}
+
+.header .user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.link {
+  color: white;
+  text-decoration: underline;
+}
+
+.upload-area {
+  width: 600px;
+  height: 280px;
+  background-color: #ccc6c6;
+  margin: 40px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7a6d6d;
+  font-size: 18px;
+}
+
+.form-container {
+  background-color: #ccc6c6;
+  width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  position: relative;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #d9d9d9;
+  border: none;
+  font-size: 16px;
+  color: white;
+}
+
+.save-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.save-btn {
+  width: 150px;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  background-color: #f4791f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #e06b1a;
+}
+
+.file-list {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #333;
+  max-height: 330px;         /* altura máxima da lista */
+  overflow-y: auto;          /* ativa rolagem vertical se necessário */
+  padding-right: 1px;       /* espaço pra barra de rolagem */
+}
+
+
+.view-btn {
+  background-color: #1e5b0d;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+    /* CSS adicional para drag and drop */
+    .upload-area {
+      border: 2px dashed #aaa;
+      padding: 40px;
+      text-align: center;
+      color: #555;
+      margin: 40px auto;
+      width: 90%;
+      max-width: 500px;
+      background-color: #f5f5f5;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-area.dragover {
+      background-color: #e0ffe0;
+      border-color: #1e5b0d;
+    }
+
+    .file-list {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .file-item button {
+      background-color: #ff6666;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .loading {
+      font-style: italic;
+      color: #777;
+    }
+/* Estilo para o botão do gerenciador */
+.manager-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.manager-btn:hover {
+  background-color: #2980b9;
+}
+
+.view-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+
+
+.save-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.save-btn {
+  width: 150px;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  background-color: #f4791f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #e06b1a;
+}
+
+
