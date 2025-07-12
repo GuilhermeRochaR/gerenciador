@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recursos Humanos</title>
-  <link rel="stylesheet" href="/frontend/css/recursos-humanos.css">
+  <link rel="stylesheet" href="frontend/css/recursos-humanos.css">
 </head>
 <body>
   <div class="header">
@@ -27,19 +27,21 @@
 
   <div class="form-container">
     <div class="form-group">
-      <label for="pesquisa">NOME DE PESQUISA</label>
+      <label for="pesquisa">NOME DE PESQUISA (OPCIONAL)</label>
       <input type="text" id="pesquisa" placeholder="DIGITE AQUI">
     </div>
     <div class="form-group">
-      <label for="observacao">OBSERVAÇÃO</label>
+      <label for="observacao">OBSERVAÇÃO (OPCIONAL)</label>
       <input type="text" id="observacao" placeholder="DIGITE AQUI">
     </div>
     <div class="save-btn-wrapper">
       <button class="save-btn" id="btnSalvar" disabled>SALVAR</button>
 
-      <div class="view-btn-wrapper" style="margin-top: 20px;">
-        <button class="view-btn" id="btnVisualizar">VISUALIZAR ARQUIVOS</button>
-      </div>
+    <div class="view-btn-wrapper" style="margin-top: 20px; display: flex; gap: 10px;">
+      <a href="gerenciador.html" target="_blank" class="manager-btn" style="text-align: center; text-decoration: none;">GERENCIADOR DE ARQUIVOS</a>
+      <a href="auditoria.html" target="_blank" class="manager-btn" style="text-align: center; text-decoration: none;">AUDITORIA DO SISTEMA</a>
+
+
 
 
       <p id="mensagemSucesso" style="color: green; display: none; margin-top: 10px;">

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Auditoria RH</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+    h2 {
+      color: #1e5b0d;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .log {
+      background-color: white;
+      border-left: 4px solid #1e5b0d;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 0 4px 4px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .log:hover {
+      transform: translateX(5px);
+    }
+    .log-details {
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-word;
+      margin-top: 8px;
+      padding: 8px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    #logsContainer {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    #logsContainer::-webkit-scrollbar {
+      width: 8px;
+    }
+    #logsContainer::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    #logsContainer::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    #logsContainer::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+    }
+    .log-timestamp {
+      color: #666;
+      font-size: 0.9em;
+    }
+        .log-entry {
+        background-color: #fff;
+        border-left: 4px solid #1e5b0d;
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 0 4px 4px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    .log-user {
+        font-weight: bold;
+        color: #1e5b0d;
+    }
+    .log-action {
+        font-style: italic;
+    }
+    .log-details {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 8px;
+        font-family: monospace;
+        font-size: 13px;
+    }
+    .log-detail-item {
+        margin-bottom: 5px;
+    }
+    .log-timestamp {
+        color: #6c757d;
+        font-size: 0.85em;
+    }
+
+  </style>
+</head>
+<body>
+  <h2>🕵️‍♂️ Registro de Atividades do Sistema</h2>
+  <div id="logsContainer"></div>
+
+  <script>
+    const container = document.getElementById("logsContainer");
+    const logs = JSON.parse(localStorage.getItem("systemLogs")) || [];
+
+    if (logs.length === 0) {
+      container.innerHTML = "<p>Nenhuma atividade registrada.</p>";
+    } else {
+      logs.reverse().forEach(log => {
+        const div = document.createElement("div");
+        div.className = "log";
+        
+        let detailsHTML = '';
+        if (log.details && Object.keys(log.details).length > 0) {
+          detailsHTML = `
+            <div class="log-details">
+              <strong>Detalhes:</strong><br>
+              ${Object.entries(log.details).map(([key, value]) => 
+                `<strong>${key}:</strong> ${typeof value === 'object' ? JSON.stringify(value) : value}`
+              ).join('<br>')}
+            </div>
+          `;
+        }
+
+        div.innerHTML = `
+          <div class="log-header">
+            <div>
+              <strong>Usuário:</strong> ${log.user?.name || 'Sistema'} (${log.user?.username || 'N/A'})<br>
+              <strong>Ação:</strong> ${log.action}<br>
+              <strong>Tela:</strong> ${log.location || 'N/A'}
+            </div>
+            <div class="log-timestamp">
+              ${log.timestamp}
+            </div>
+          </div>
+          ${detailsHTML}
+        `;
+        
+        container.appendChild(div);
+      });
+    }
+
+      document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('logsContainer');
+    const logs = JSON.parse(localStorage.getItem('logAtividades')) || [];
+
+    if (logs.length === 0) {
+      container.innerHTML = '<p>Nenhuma atividade registrada ainda.</p>';
+      return;
+    }
+
+    logs.reverse().forEach(log => {
+      const logElement = document.createElement('div');
+      logElement.className = 'log-entry';
+      
+      // Formata detalhes (compatível com versões antigas e novas)
+      let detailsHTML = '';
+      const details = log.detalhes || {};
+      if (log.infoLocalizacao) details['Localização'] = log.infoLocalizacao;
+      
+      if (Object.keys(details).length > 0) {
+        detailsHTML = `
+          <div class="log-details">
+            ${Object.entries(details).map(([key, value]) => 
+              `<div><strong>${key}:</strong> ${value}</div>`
+            ).join('')}
+          </div>
+        `;
+      }
+
+      logElement.innerHTML = `
+        <div class="log-header">
+          <div>
+            <span class="log-user">${log.usuario || 'Sistema'}</span>
+            ${log.acao ? `- ${log.acao}` : ''}
+          </div>
+          <div class="log-timestamp">${log.dataHora || log.timestamp || ''}</div>
+        </div>
+        ${detailsHTML}
+      `;
+      
+      container.appendChild(logElement);
+    });
+  });
+  </script>
+</body>
+</html>

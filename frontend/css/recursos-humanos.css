@@ -77,16 +77,24 @@ input[type="text"] {
 
 .save-btn-wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .save-btn {
-  background-color: #888282;
-  color: black;
+  width: 150px;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  background-color: #f4791f;
+  color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #e06b1a;
 }
 
 .file-list {
@@ -154,3 +162,50 @@ input[type="text"] {
       font-style: italic;
       color: #777;
     }
+/* Estilo para o botão do gerenciador */
+.manager-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.manager-btn:hover {
+  background-color: #2980b9;
+}
+
+.view-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+
+
+.save-btn-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.save-btn {
+  width: 150px;
+  padding: 12px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  background-color: #f4791f;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #e06b1a;
+}

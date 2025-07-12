@@ -40,5 +40,44 @@
       </div>
     </div>
   </div>
+
+  <script type="module">
+    import logger from './logger.js';
+    
+    document.querySelector('.save-btn').addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        link: document.getElementById('link').value,
+        numero: document.getElementById('numero').value,
+        nome: document.getElementById('nome').value,
+        obs: document.getElementById('obs').value
+      };
+
+      // Validar campos obrigatórios
+      if (!formData.link || !formData.numero) {
+        logger.log('Tentativa de registro financeiro inválida', {
+          motivo: 'Campos obrigatórios faltando',
+          dados: formData
+        });
+        alert('Por favor, preencha pelo menos os campos Link e Número');
+        return;
+      }
+
+      // Registrar ação
+      logger.log('Registro financeiro salvo', {
+        tipo: 'Financeiro',
+        dados: formData
+      });
+
+      alert('Dados salvos com sucesso!');
+      
+      // Limpar formulário
+      document.getElementById('link').value = '';
+      document.getElementById('numero').value = '';
+      document.getElementById('nome').value = '';
+      document.getElementById('obs').value = '';
+    });
+  </script>
 </body>
 </html>

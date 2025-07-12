@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador de Arquivos</title>
+  <link rel="stylesheet" href="frontend/css/gerenciador.css">
+</head>
+<body>
+  <div class="header">
+    <div><strong>GERENCIADOR DE ARQUIVOS</strong></div>
+    <div class="user">
+      <span>NOME COMPLETO DO USUÁRIO</span>
+      <div class="icon">👤</div>
+    </div>
+    <div class="nav-buttons">
+      <button onclick="voltarParaRH()" class="nav-btn">← Voltar para RH</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+
+    <!-- Seção de Pesquisa -->
+    <div class="search-section">
+      <h3>🔍 Pesquisar Arquivos</h3>
+      <div class="search-group">
+        <input type="text" id="campoPesquisa" placeholder="Digite o nome do arquivo ou palavra-chave...">
+        <button onclick="pesquisarArquivos()" class="search-btn">Pesquisar</button>
+        <button onclick="limparPesquisa()" class="clear-btn">Limpar</button>
+      </div>
+      
+      <div class="filter-group">
+        <label>Filtrar por:</label>
+        <select id="filtroTipo">
+          <option value="todos">Todos os arquivos</option>
+          <option value="manual">Exclusão manual</option>
+          <option value="automatica">Exclusão automática</option>
+          <option value="expirados">Arquivos expirados</option>
+        </select>
+        
+        <label style="margin-left: 20px;">Origem:</label>
+        <select id="filtroOrigem">
+          <option value="todas">Todas as origens</option>
+          <option value="RH">RH</option>
+          <option value="Cartões">Cartões</option>
+          <option value="Sistema">Sistema</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Seção de Arquivos Registrados -->
+    <div class="files-section">
+      <h3>📁 Arquivos Registrados</h3>
+      <div class="files-stats">
+        <span id="totalArquivos">Total: 0 arquivos</span>
+        <span id="arquivosExpirados">Expirados: 0</span>
+      </div>
+      
+      <div id="listaArquivos" class="files-list">
+        <p class="no-files">Nenhum arquivo encontrado.</p>
+      </div>
+    </div>
+
+    <!-- Modal para edição -->
+    <div id="modalEdicao" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h3>Editar Arquivo</h3>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nome do arquivo:</label>
+            <span id="nomeArquivoModal"></span>
+          </div>
+          <div class="form-group">
+            <label>Tipo de exclusão:</label>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="tipoExclusaoModal" value="manual">
+                Manual
+              </label>
+              <label>
+                <input type="radio" name="tipoExclusaoModal" value="automatica">
+                Automática
+              </label>
+            </div>
+          </div>
+          <div class="form-group" id="tempoExclusaoModalGroup">
+            <label for="dataExpiracaoModal">Data de expiração:</label>
+            <input type="date" id="dataExpiracaoModal" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            <small style="display: block; margin-top: 5px; color: #666;">
+              <span id="textoAjudaData">Para exclusão manual, deixe em branco para manter indefinidamente ou escolha uma data específica</span>
+            </small>
+          </div>
+          <div class="modal-buttons">
+            <button onclick="salvarEdicao()" class="save-btn">Salvar</button>
+            <button onclick="fecharModal()" class="cancel-btn">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js/gerenciador.js"></script>
+</body>
+</html>
