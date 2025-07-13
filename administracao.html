@@ -1,6 +1,3 @@
-<!-- atualizado -->
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -60,17 +57,41 @@
 
   <button class="save-btn">SALVAR</button>
 
-  <script type="module">
-    import logger from './logger.js';
-    
-    // Funcionalidade de upload de arquivos
+  <script>
+    // Função para registrar atividades (ADICIONADO)
+    function registrarAtividade(acao, detalhes = {}) {
+      const logs = JSON.parse(localStorage.getItem('systemLogs') || '[]');
+      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      
+      logs.push({
+        timestamp: new Date().toLocaleString("pt-BR", {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }),
+        user: {
+          username: user.username || 'Sistema',
+          name: user.name || 'Usuário não identificado'
+        },
+        action: acao,
+        details: detalhes,
+        location: 'administracao.html'
+      });
+      
+      localStorage.setItem('systemLogs', JSON.stringify(logs));
+    }
+
+    // Funcionalidade de upload de arquivos (ORIGINAL)
     const uploadArea = document.getElementById("uploadArea");
     const fileInput = document.getElementById("fileInput");
     const fileList = document.getElementById("fileList");
     const saveBtn = document.querySelector(".save-btn");
     let arquivos = [];
 
-    // Event listeners para drag and drop
+    // Event listeners para drag and drop (ORIGINAL)
     uploadArea.addEventListener("dragover", (e) => {
       e.preventDefault();
       uploadArea.classList.add("dragover");
@@ -87,16 +108,16 @@
       adicionarArquivos(files);
     });
 
-    // Click para abrir seletor de arquivos
+    // Click para abrir seletor de arquivos (MODIFICADO)
     uploadArea.addEventListener("click", () => {
       fileInput.click();
     });
 
     fileInput.addEventListener("change", (e) => {
       const files = Array.from(e.target.files);
-      logger.log('Arquivos selecionados', {
+      registrarAtividade('Arquivos selecionados', {  // ADICIONADO
         quantidade: files.length,
-        nomes: files.map(f => f.name)
+        tipos: [...new Set(files.map(f => f.name.split('.').pop()))]
       });
       adicionarArquivos(files);
     });
@@ -122,17 +143,17 @@
       });
     }
 
+    // Função para remover arquivo (MODIFICADA)
     window.removerArquivo = function(index) {
-      const arquivoRemovido = arquivos[index].name;
-      logger.log('Arquivo removido', {
-        arquivo: arquivoRemovido,
-        index: index
+      registrarAtividade('Arquivo removido', {  // ADICIONADO
+        nome: arquivos[index].name,
+        tamanho: arquivos[index].size
       });
       arquivos.splice(index, 1);
       atualizarListaArquivos();
     };
 
-    // Funções auxiliares (mantidas do seu código original)
+    // Funções auxiliares (ORIGINAL)
     function formatarTamanho(bytes) {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
@@ -152,42 +173,40 @@
       localStorage.setItem('arquivos_registrados', JSON.stringify(arquivosGerenciador));
     }
 
-    // Event listener para o botão salvar (com logging)
+    // Event listener para o botão salvar (MODIFICADO)
     saveBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
-      // Coletar dados do formulário
-      const formData = {
-        nome: document.getElementById("nome").value.trim(),
-        cpf: document.getElementById("cpf").value.trim(),
-        cartao: document.getElementById("cartao").value.trim(),
-        orgao: document.getElementById("orgao1").value.trim(),
-        dataCredito: document.getElementById("data").value.trim(),
-        descricao: document.getElementById("descricao").value.trim(),
-        arquivos: arquivos.map(f => f.name)
-      };
+      // Coletar dados do formulário (ORIGINAL)
+      const nome = document.getElementById("nome").value.trim();
+      const cpf = document.getElementById("cpf").value.trim();
+      const cartao = document.getElementById("cartao").value.trim();
+      const orgao = document.getElementById("orgao1").value.trim();
+      const dataCredito = document.getElementById("data").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
 
-      // Validar campos obrigatórios
-      if (!formData.nome || !formData.cpf || !formData.cartao) {
-        logger.log('Tentativa de cadastro inválida', {
+      // Validar campos obrigatórios (MODIFICADO)
+      if (!nome || !cpf || !cartao) {
+        registrarAtividade('Tentativa de cadastro inválida', {  // ADICIONADO
           motivo: 'Campos obrigatórios faltando',
-          dados: formData
+          camposPreenchidos: { nome: !!nome, cpf: !!cpf, cartao: !!cartao }
         });
         alert("Por favor, preencha pelo menos os campos Nome, CPF e Número do Cartão.");
         return;
       }
 
-      // Registrar ação
-      logger.log('Cartão administrativo cadastrado', {
-        tipo: 'Cartão',
-        dados: formData,
-        totalArquivos: arquivos.length
+      registrarAtividade('Início do processamento de cartão', {  // ADICIONADO
+        dados: {
+          nome: nome.substring(0, 1) + '***', // Ofusca nome
+          cpf: cpf.substring(0, 3) + '***',  // Ofusca CPF
+          cartao: cartao.slice(-4) + '****'  // Ofusca cartão
+        }
       });
 
       const dataEnvio = new Date();
       let arquivosSalvos = 0;
 
-      // Salvar arquivos no gerenciador
+      // Salvar arquivos no gerenciador (ORIGINAL)
       arquivos.forEach((arquivo, index) => {
         const arquivoParaGerenciador = {
           id: Date.now() + index,
@@ -199,21 +218,33 @@
           tipo: obterTipoArquivo(arquivo.name),
           observacaoArquivo: '',
           origem: 'Cartões',
-          dadosCartao: formData
+          dadosCartao: {
+            nome,
+            cpf,
+            numeroCartao: cartao,
+            orgao,
+            dataCredito,
+            descricao: descricao || 'Sem descrição'
+          }
         };
 
         salvarArquivoNoGerenciador(arquivoParaGerenciador);
         arquivosSalvos++;
       });
 
-      // Feedback para o usuário
+      // Mostrar mensagem de sucesso (ORIGINAL)
       if (arquivosSalvos > 0) {
+        registrarAtividade('Cartão salvo com arquivos', {  // ADICIONADO
+          totalArquivos: arquivosSalvos,
+          tiposArquivos: [...new Set(arquivos.map(f => f.name.split('.').pop()))]
+        });
         alert(`✅ Cartão salvo com sucesso!\n${arquivosSalvos} arquivo(s) enviados para o gerenciador.`);
       } else {
+        registrarAtividade('Cartão salvo sem arquivos');  // ADICIONADO
         alert("✅ Cartão salvo com sucesso!");
       }
 
-      // Limpar formulário
+      // Limpar formulário (ORIGINAL)
       document.getElementById("nome").value = "";
       document.getElementById("cpf").value = "";
       document.getElementById("cartao").value = "";

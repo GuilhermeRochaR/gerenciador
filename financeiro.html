@@ -1,12 +1,10 @@
-<!-- atualizado -->
- 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Financeiro</title>
-  <link rel="stylesheet" href="/frontend/css/financeiro.css">
+  <link rel="stylesheet" href="frontend/css/financeiro.css">
 </head>
 <body>
   <div class="header">
@@ -32,52 +30,146 @@
         <input type="text" id="nome" placeholder="DIGITE AQUI">
       </div>
       <div class="form-group">
-        <label for="obs">OBSERVAÇÃO:</label>
+        <label for="obs">OBSERVAÇÃO (OPCIONAL):</label>
         <input type="text" id="obs" placeholder="DIGITE AQUI">
       </div>
       <div class="save-btn-wrapper">
-        <button class="save-btn">SALVAR</button>
+        <button class="save-btn" id="btnSalvar">SALVAR</button>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import logger from './logger.js';
-    
-    document.querySelector('.save-btn').addEventListener('click', function(e) {
+  <script>
+    // Função para registrar atividades (ADICIONADA)
+    function registrarAtividade(acao, detalhes = {}) {
+      const logs = JSON.parse(localStorage.getItem('systemLogs') || []);
+      const user = JSON.parse(localStorage.getItem('currentUser') || {});
+      
+      logs.push({
+        timestamp: new Date().toLocaleString("pt-BR", {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        }),
+        user: {
+          username: user.username || 'Sistema',
+          name: user.name || 'Usuário não identificado'
+        },
+        action: acao,
+        details: detalhes,
+        location: 'financeiro.html'
+      });
+      
+      localStorage.setItem('systemLogs', JSON.stringify(logs));
+    }
+
+    // Funcionalidade para salvar dados (MODIFICADA)
+    document.getElementById('btnSalvar').addEventListener('click', function(e) {
       e.preventDefault();
       
-      const formData = {
-        link: document.getElementById('link').value,
-        numero: document.getElementById('numero').value,
-        nome: document.getElementById('nome').value,
-        obs: document.getElementById('obs').value
-      };
-
-      // Validar campos obrigatórios
-      if (!formData.link || !formData.numero) {
-        logger.log('Tentativa de registro financeiro inválida', {
+      // Coletar dados do formulário
+      const link = document.getElementById('link').value.trim();
+      const numero = document.getElementById('numero').value.trim();
+      const nome = document.getElementById('nome').value.trim();
+      const observacao = document.getElementById('obs').value.trim();
+      
+      // Validar campos obrigatórios (MODIFICADO)
+      if (!link || !numero || !nome) {
+        registrarAtividade('Tentativa de registro inválida', {  // ADICIONADO
           motivo: 'Campos obrigatórios faltando',
-          dados: formData
+          camposPreenchidos: {
+            link: !!link,
+            numero: !!numero,
+            nome: !!nome
+          }
         });
-        alert('Por favor, preencha pelo menos os campos Link e Número');
+        alert('Por favor, preencha os campos obrigatórios: Link, Número e Nome.');
         return;
       }
 
-      // Registrar ação
-      logger.log('Registro financeiro salvo', {
-        tipo: 'Financeiro',
-        dados: formData
+      registrarAtividade('Início do processamento financeiro', {  // ADICIONADO
+        dados: {
+          link: link.substring(0, 20) + (link.length > 20 ? '...' : ''), // Limita tamanho
+          numero: numero.substring(0, 3) + '****', // Ofusca número
+          nome: nome.substring(0, 1) + '***' // Ofusca nome
+        }
       });
-
-      alert('Dados salvos com sucesso!');
       
-      // Limpar formulário
+      // Criar conteúdo do arquivo de texto (ORIGINAL)
+      const dataAtual = new Date().toLocaleString('pt-BR');
+      const conteudoArquivo = `DADOS FINANCEIROS
+===================
+
+Data de Criação: ${dataAtual}
+
+LINK: ${link}
+NÚMERO: ${numero}
+NOME: ${nome}
+OBSERVAÇÃO: ${observacao || 'Não informado'}
+
+---
+Arquivo gerado automaticamente pelo sistema Financeiro.`;
+      
+      // Criar nome do arquivo (ORIGINAL)
+      const agora = new Date();
+      const nomeArquivo = `financeiro_${agora.getFullYear()}_${String(agora.getMonth() + 1).padStart(2, '0')}_${String(agora.getDate()).padStart(2, '0')}_${String(agora.getHours()).padStart(2, '0')}${String(agora.getMinutes()).padStart(2, '0')}.txt`;
+      
+      // Criar objeto do arquivo (ORIGINAL)
+      const arquivoParaGerenciador = {
+        id: Date.now(),
+        nome: nomeArquivo,
+        tipoExclusao: 'manual',
+        dataEnvio: agora,
+        dataExpiracao: null,
+        tamanho: formatarTamanho(conteudoArquivo.length),
+        tipo: 'TXT',
+        origem: 'Financeiro',
+        conteudo: conteudoArquivo,
+        dadosFinanceiro: {
+          link,
+          numero,
+          nome,
+          observacao: observacao || 'Não informado'
+        }
+      };
+      
+      // Salvar no gerenciador (ORIGINAL)
+      salvarArquivoNoGerenciador(arquivoParaGerenciador);
+      
+      registrarAtividade('Registro financeiro salvo', {  // ADICIONADO
+        arquivoGerado: nomeArquivo,
+        tamanho: formatarTamanho(conteudoArquivo.length),
+        caracteresObservacao: observacao.length
+      });
+      
+      // Mostrar mensagem de sucesso (ORIGINAL)
+      alert('✅ Dados salvos com sucesso no gerenciador como arquivo de texto!');
+      
+      // Limpar formulário (ORIGINAL)
       document.getElementById('link').value = '';
       document.getElementById('numero').value = '';
       document.getElementById('nome').value = '';
       document.getElementById('obs').value = '';
     });
+    
+    // Função para salvar arquivo no gerenciador (ORIGINAL)
+    function salvarArquivoNoGerenciador(arquivo) {
+      let arquivosGerenciador = JSON.parse(localStorage.getItem('arquivos_registrados') || '[]');
+      arquivosGerenciador.push(arquivo);
+      localStorage.setItem('arquivos_registrados', JSON.stringify(arquivosGerenciador));
+    }
+    
+    // Função para formatar tamanho do arquivo (ORIGINAL)
+    function formatarTamanho(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
   </script>
 </body>
 </html>
